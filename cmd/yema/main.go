@@ -2,19 +2,33 @@ package main
 
 import (
 	"fmt"
-	ycue "github.com/aep/yema/cue"
-	"github.com/aep/yema/parser"
-	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 	"io"
 	"log"
 	"os"
+	"strings"
+
+	ycue "github.com/aep/yema/cue"
+	"github.com/aep/yema/golang"
+	"github.com/aep/yema/jsonschema"
+	"github.com/aep/yema/parser"
+	"github.com/aep/yema/rust"
+	"github.com/aep/yema/typescript"
+	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 
 	"cuelang.org/go/cue/format"
 )
 
 var (
-	outputFormat string
+	outputFormat     string
+	codePackage      string
+	codeModuleName   string
+	codeTypeName     string
+	tsNamespace      string
+	tsUseInterfaces  bool
+	tsExportAll      bool
+	rustDeriveTraits string
+	rustUseRename    bool
 )
 
 var rootCmd = &cobra.Command{
@@ -58,6 +72,52 @@ var rootCmd = &cobra.Command{
 			}
 
 			fmt.Println(string(bytes))
+		case "jsonschema":
+			jsonBytes, err := jsonschema.ToJSONSchema(yy)
+			if err != nil {
+				log.Fatalf("Error generating JSON Schema: %v", err)
+			}
+			fmt.Println(string(jsonBytes))
+		case "golang":
+			goBytes, err := golang.ToGolangWithOptions(yy, golang.Options{
+				Package:  codePackage,
+				RootType: codeTypeName,
+			})
+			if err != nil {
+				log.Fatalf("Error generating Go structs: %v", err)
+			}
+			fmt.Println(string(goBytes))
+		case "typescript":
+			tsBytes, err := typescript.ToTypeScriptWithOptions(yy, typescript.Options{
+				Namespace:    tsNamespace,
+				RootType:     codeTypeName,
+				UseInterfaces: tsUseInterfaces,
+				ExportAll:    tsExportAll,
+			})
+			if err != nil {
+				log.Fatalf("Error generating TypeScript definitions: %v", err)
+			}
+			fmt.Println(string(tsBytes))
+		case "rust":
+			// Parse the derive traits string into a slice
+			var deriveTraits []string
+			if rustDeriveTraits != "" {
+				deriveTraits = strings.Split(rustDeriveTraits, ",")
+				for i := range deriveTraits {
+					deriveTraits[i] = strings.TrimSpace(deriveTraits[i])
+				}
+			}
+			
+			rustBytes, err := rust.ToRustWithOptions(yy, rust.Options{
+				Module:        codeModuleName,
+				RootType:      codeTypeName,
+				DeriveTraits:  deriveTraits,
+				UseSerdeRename: rustUseRename,
+			})
+			if err != nil {
+				log.Fatalf("Error generating Rust structs: %v", err)
+			}
+			fmt.Println(string(rustBytes))
 		default:
 			log.Fatalf("Unsupported output format: %s", outputFormat)
 		}
@@ -72,5 +132,13 @@ func main() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "cue", "Output format (cue, jsonschema)")
+	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "cue", "Output format (cue, jsonschema, golang, typescript, rust)")
+	rootCmd.PersistentFlags().StringVar(&codePackage, "package", "generated", "Package name for generated code (golang)")
+	rootCmd.PersistentFlags().StringVar(&codeModuleName, "module", "generated", "Module name for generated code (rust)")
+	rootCmd.PersistentFlags().StringVar(&codeTypeName, "type", "Type", "Root type name for generated code")
+	rootCmd.PersistentFlags().StringVar(&tsNamespace, "namespace", "", "Namespace for TypeScript code (typescript)")
+	rootCmd.PersistentFlags().BoolVar(&tsUseInterfaces, "interfaces", true, "Use interfaces instead of type aliases (typescript)")
+	rootCmd.PersistentFlags().BoolVar(&tsExportAll, "export-all", true, "Export all TypeScript types (typescript)")
+	rootCmd.PersistentFlags().StringVar(&rustDeriveTraits, "derive", "Debug,Clone,Serialize,Deserialize", "Comma-separated list of traits to derive (rust)")
+	rootCmd.PersistentFlags().BoolVar(&rustUseRename, "serde-rename", true, "Use serde rename attributes for JSON field names (rust)")
 }

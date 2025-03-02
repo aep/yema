@@ -13,6 +13,7 @@ addresses: [{
 favoriteObjects:
   - color: string
     shape?: int
+stash?: bytes
 settings: 
   notifications:  bool
   theme:          string
