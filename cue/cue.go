@@ -5,18 +5,16 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/token"
 	"github.com/aep/yema"
 )
 
 // TypeToCue converts an abstract Type to a CUE value
-func ToCue(t *yema.Type) (cue.Value, error) {
+func ToCue(ctx *cue.Context, t *yema.Type) (cue.Value, error) {
 	if t == nil {
 		return cue.Value{}, fmt.Errorf("nil type provided")
 	}
 
-	ctx := cuecontext.New()
 	file := &ast.File{}
 
 	if t.Kind != yema.Struct {

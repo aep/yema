@@ -16,6 +16,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 )
 
@@ -62,7 +63,7 @@ It can convert Yema schemas to various formats and validate data against schemas
 
 		switch outputFormat {
 		case "cue":
-			value, err := cue.ToCue(yy)
+			value, err := cue.ToCue(cuecontext.New(), yy)
 			if err != nil {
 				log.Fatalf("Error parsing schema: %v", err)
 			}
@@ -144,3 +145,4 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&rustDeriveTraits, "derive", "Debug,Clone,Serialize,Deserialize", "Comma-separated list of traits to derive (rust)")
 	rootCmd.PersistentFlags().BoolVar(&rustUseRename, "serde-rename", true, "Use serde rename attributes for JSON field names (rust)")
 }
+
