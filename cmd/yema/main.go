@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	ycue "github.com/aep/yema/cue"
+	"github.com/aep/yema/cue"
 	"github.com/aep/yema/golang"
 	"github.com/aep/yema/jsonschema"
 	"github.com/aep/yema/parser"
@@ -32,10 +32,12 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:  "yema",
+	Use:   "yema",
+	Short: "Yema schema processing tool",
+	Long: `Yema is a tool for working with schema definitions.
+It can convert Yema schemas to various formats and validate data against schemas.`,
 	Args: cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-
 		var input io.Reader = os.Stdin
 
 		if len(args) > 0 {
@@ -60,7 +62,7 @@ var rootCmd = &cobra.Command{
 
 		switch outputFormat {
 		case "cue":
-			value, err := ycue.ToCue(yy)
+			value, err := cue.ToCue(yy)
 			if err != nil {
 				log.Fatalf("Error parsing schema: %v", err)
 			}
@@ -89,10 +91,10 @@ var rootCmd = &cobra.Command{
 			fmt.Println(string(goBytes))
 		case "typescript":
 			tsBytes, err := typescript.ToTypeScriptWithOptions(yy, typescript.Options{
-				Namespace:    tsNamespace,
-				RootType:     codeTypeName,
+				Namespace:     tsNamespace,
+				RootType:      codeTypeName,
 				UseInterfaces: tsUseInterfaces,
-				ExportAll:    tsExportAll,
+				ExportAll:     tsExportAll,
 			})
 			if err != nil {
 				log.Fatalf("Error generating TypeScript definitions: %v", err)
@@ -107,11 +109,11 @@ var rootCmd = &cobra.Command{
 					deriveTraits[i] = strings.TrimSpace(deriveTraits[i])
 				}
 			}
-			
+
 			rustBytes, err := rust.ToRustWithOptions(yy, rust.Options{
-				Module:        codeModuleName,
-				RootType:      codeTypeName,
-				DeriveTraits:  deriveTraits,
+				Module:         codeModuleName,
+				RootType:       codeTypeName,
+				DeriveTraits:   deriveTraits,
 				UseSerdeRename: rustUseRename,
 			})
 			if err != nil {

@@ -1,4 +1,4 @@
-package yema
+package cue
 
 import (
 	"fmt"
