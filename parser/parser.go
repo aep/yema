@@ -103,12 +103,7 @@ func parseValueToType(fieldName string, value interface{}, isOptional bool) (yem
 
 	case []interface{}:
 		if len(v) == 0 {
-			// Empty array
-			return yema.Type{
-				Kind:     yema.Array,
-				Optional: isOptional,
-				Array:    &yema.Type{Kind: yema.Invalid}, // Empty array doesn't specify element type
-			}, nil
+			return yema.Type{}, fmt.Errorf("failed parsing field '%s', must declare type of array item", fieldName)
 		}
 
 		if len(v) > 1 {
