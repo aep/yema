@@ -1,0 +1,22 @@
+middleName?:    string
+age:            int
+bob:            [int]
+huh:            string
+twoInts:        [int]
+atLeastTwoInts: [int]
+phones:         [string]
+addresses: [{
+  street:     string,
+  "city?":      string,
+  zipCode:    string
+}]
+favoriteObjects:
+  - color: string
+    shape?: int
+settings: 
+  notifications:  bool
+  theme:          string
+  limits: 
+    maxItems:     int32
+    maxUsers:     int64
+
