@@ -1,7 +1,9 @@
 YEMA - the interchangeable schema language
 ------------------------------------------
 
-yema is extremly simple and obvious.
+yema is an extremly simple and obvious schema definition.
+this is currently used in apogy and its unclear if its going to be made useful for other purposes.
+
 its only purpose is to generate type bindings for all programming languages,
 it does intentionally NOT support constraints like jsonschema.
 it also does not define any wire format, although you'd probably want json, msgpack, etc..

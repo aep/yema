@@ -17,7 +17,7 @@ type Options struct {
 }
 
 // ToGolangWithOptions converts a yema.Type to Go struct definitions with custom options
-func ToGolangWithOptions(t *yema.Type, opts Options) ([]byte, error) {
+func ToGolang(t *yema.Type, opts Options) ([]byte, error) {
 	if t == nil {
 		return nil, fmt.Errorf("nil type provided")
 	}
@@ -44,14 +44,6 @@ func ToGolangWithOptions(t *yema.Type, opts Options) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
-}
-
-// ToGolang converts a yema.Type to Go struct definitions with default options
-func ToGolang(t *yema.Type) ([]byte, error) {
-	return ToGolangWithOptions(t, Options{
-		Package:  "generated",
-		RootType: "Root",
-	})
 }
 
 // generateStructs recursively generates Go struct definitions
@@ -205,3 +197,4 @@ func toCamelCase(s string) string {
 
 	return result
 }
+

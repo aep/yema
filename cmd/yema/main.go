@@ -82,7 +82,7 @@ It can convert Yema schemas to various formats and validate data against schemas
 			}
 			fmt.Println(string(jsonBytes))
 		case "golang":
-			goBytes, err := golang.ToGolangWithOptions(yy, golang.Options{
+			goBytes, err := golang.ToGolang(yy, golang.Options{
 				Package:  codePackage,
 				RootType: codeTypeName,
 			})
@@ -91,7 +91,7 @@ It can convert Yema schemas to various formats and validate data against schemas
 			}
 			fmt.Println(string(goBytes))
 		case "typescript":
-			tsBytes, err := typescript.ToTypeScriptWithOptions(yy, typescript.Options{
+			tsBytes, err := typescript.ToTypeScript(yy, typescript.Options{
 				Namespace:     tsNamespace,
 				RootType:      codeTypeName,
 				UseInterfaces: tsUseInterfaces,
@@ -111,7 +111,7 @@ It can convert Yema schemas to various formats and validate data against schemas
 				}
 			}
 
-			rustBytes, err := rust.ToRustWithOptions(yy, rust.Options{
+			rustBytes, err := rust.ToRust(yy, rust.Options{
 				Module:         codeModuleName,
 				RootType:       codeTypeName,
 				DeriveTraits:   deriveTraits,
@@ -145,4 +145,3 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&rustDeriveTraits, "derive", "Debug,Clone,Serialize,Deserialize", "Comma-separated list of traits to derive (rust)")
 	rootCmd.PersistentFlags().BoolVar(&rustUseRename, "serde-rename", true, "Use serde rename attributes for JSON field names (rust)")
 }
-

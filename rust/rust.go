@@ -22,7 +22,7 @@ type Options struct {
 }
 
 // ToRustWithOptions converts a yema.Type to Rust struct definitions with custom options
-func ToRustWithOptions(t *yema.Type, opts Options) ([]byte, error) {
+func ToRust(t *yema.Type, opts Options) ([]byte, error) {
 	if t == nil {
 		return nil, fmt.Errorf("nil type provided")
 	}
@@ -65,16 +65,6 @@ func ToRustWithOptions(t *yema.Type, opts Options) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
-}
-
-// ToRust converts a yema.Type to Rust struct definitions with default options
-func ToRust(t *yema.Type) ([]byte, error) {
-	return ToRustWithOptions(t, Options{
-		Module:         "generated",
-		RootType:       "Root",
-		DeriveTraits:   []string{"Debug", "Clone", "Serialize", "Deserialize"},
-		UseSerdeRename: true,
-	})
 }
 
 // generateStructs recursively generates Rust struct definitions
@@ -266,4 +256,3 @@ func containsTrait(traits []string, target string) bool {
 	}
 	return false
 }
-

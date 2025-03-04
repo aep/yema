@@ -21,7 +21,7 @@ type Options struct {
 }
 
 // ToTypeScriptWithOptions converts a yema.Type to TypeScript definitions with custom options
-func ToTypeScriptWithOptions(t *yema.Type, opts Options) ([]byte, error) {
+func ToTypeScript(t *yema.Type, opts Options) ([]byte, error) {
 	if t == nil {
 		return nil, fmt.Errorf("nil type provided")
 	}
@@ -59,15 +59,6 @@ func ToTypeScriptWithOptions(t *yema.Type, opts Options) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// ToTypeScript converts a yema.Type to TypeScript definitions with default options
-func ToTypeScript(t *yema.Type) ([]byte, error) {
-	return ToTypeScriptWithOptions(t, Options{
-		RootType:     "Root",
-		UseInterfaces: true,
-		ExportAll:    true,
-	})
-}
-
 // generateInterfaces recursively generates TypeScript interface definitions
 func generateInterfaces(t *yema.Type, typeName string, buf *bytes.Buffer, generatedTypes map[string]bool, opts Options) error {
 	if t.Kind != yema.Struct {
@@ -84,13 +75,13 @@ func generateInterfaces(t *yema.Type, typeName string, buf *bytes.Buffer, genera
 
 	// Start type definition
 	fmt.Fprintf(buf, "/**\n * %s represents a generated type\n */\n", typeName)
-	
+
 	// Determine export keyword
 	exportKeyword := ""
 	if opts.ExportAll || typeName == opts.RootType {
 		exportKeyword = "export "
 	}
-	
+
 	// Use interface or type alias based on options
 	if opts.UseInterfaces {
 		fmt.Fprintf(buf, "%sinterface %s {\n", exportKeyword, typeName)
@@ -155,9 +146,9 @@ func typeToTypeScriptType(t *yema.Type, parentName, fieldName string) (string, s
 	switch t.Kind {
 	case yema.Bool:
 		tsType = "boolean"
-	case yema.Int, yema.Int8, yema.Int16, yema.Int32, yema.Int64, 
-		 yema.Uint, yema.Uint8, yema.Uint16, yema.Uint32, yema.Uint64,
-		 yema.Float32, yema.Float64:
+	case yema.Int, yema.Int8, yema.Int16, yema.Int32, yema.Int64,
+		yema.Uint, yema.Uint8, yema.Uint16, yema.Uint32, yema.Uint64,
+		yema.Float32, yema.Float64:
 		tsType = "number"
 	case yema.String:
 		tsType = "string"
@@ -205,3 +196,4 @@ func toCamelCase(s string) string {
 
 	return result
 }
+
