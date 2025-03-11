@@ -2,6 +2,7 @@
 package validator
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/aep/yema"
 	"strconv"
@@ -139,6 +140,12 @@ func validateIntValue(value interface{}, kind yema.Kind, path string) error {
 	var isInt bool
 
 	switch v := value.(type) {
+	case json.Number:
+		{
+			var err error
+			intVal, err = v.Int64()
+			isInt = err == nil
+		}
 	case int:
 		intVal, isInt = int64(v), true
 	case int8:
@@ -188,6 +195,14 @@ func validateUintValue(value interface{}, kind yema.Kind, path string) error {
 	var isUint bool
 
 	switch v := value.(type) {
+	case json.Number:
+		{
+			intVal, err := v.Int64()
+			if intVal >= 0 {
+				uintVal = uint64(intVal)
+				isUint = err == nil
+			}
+		}
 	case uint:
 		uintVal, isUint = uint64(v), true
 	case uint8:
@@ -256,6 +271,12 @@ func validateFloatValue(value interface{}, kind yema.Kind, path string) error {
 	var isFloat bool
 
 	switch v := value.(type) {
+	case json.Number:
+		{
+			var err error
+			floatVal, err = v.Float64()
+			isFloat = err == nil
+		}
 	case float32:
 		floatVal, isFloat = float64(v), true
 	case float64:
